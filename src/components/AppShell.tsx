@@ -46,7 +46,9 @@ export function AppShell() {
             </div>
             <button
               type="button"
-              className="sidebar-menu-button"
+              className={
+                isMenuOpen ? 'sidebar-menu-button sidebar-menu-button-open' : 'sidebar-menu-button'
+              }
               aria-expanded={isMenuOpen}
               aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
               onClick={() => setIsMenuOpen((current) => !current)}
