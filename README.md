@@ -2,11 +2,12 @@
 
 A React + TypeScript B2B healthcare SaaS assignment project with:
 
-- Firebase authentication wiring with demo fallback
+- Firebase authentication flow
 - Protected dashboard, analytics, and patient management routes
 - Zustand state management
 - Grid/List patient views with responsive UI
 - Service worker registration and local notification trigger
+- Lazy-loaded application routes
 
 ## Stack
 
@@ -24,18 +25,12 @@ npm install
 npm run dev
 ```
 
-## Demo login
-
-If Firebase env vars are not configured, use:
-
-- `demo@healthsync.com`
-- `demo1234`
-
 ## Firebase setup
 
 1. Copy `.env.example` to `.env`
 2. Add your Firebase web app config
 3. Enable Email/Password auth in Firebase Authentication
+4. Create at least one test user in Firebase Authentication
 
 ## Notification use case
 

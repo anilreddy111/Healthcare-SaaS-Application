@@ -23,5 +23,5 @@ export interface DashboardMetric {
 export interface AuthSession {
   email: string;
   displayName: string;
-  mode: 'firebase' | 'demo';
+  mode: 'firebase';
 }

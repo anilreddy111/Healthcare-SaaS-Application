@@ -5,8 +5,7 @@ import { useAppStore } from '../store/useAppStore';
 
 export function useAuthBootstrap() {
   const setSession = useAppStore((state) => state.setSession);
-  const persistedSession = useAppStore((state) => state.session);
-  const [isReady, setIsReady] = useState(!isFirebaseConfigured || !!persistedSession);
+  const [isReady, setIsReady] = useState(!isFirebaseConfigured);
 
   useEffect(() => {
     if (!isFirebaseConfigured || !auth) {
