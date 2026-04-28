@@ -173,6 +173,34 @@ button {
   padding: 2rem;
 }
 
+.auth-mode-switch {
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.35rem;
+  padding: 0.35rem;
+  border-radius: 18px;
+  background: rgba(16, 48, 68, 0.08);
+}
+
+.auth-mode-button,
+.text-button {
+  border: 0;
+  background: transparent;
+}
+
+.auth-mode-button {
+  padding: 0.8rem 1rem;
+  border-radius: 14px;
+  color: rgba(16, 48, 68, 0.72);
+  font-weight: 600;
+}
+
+.auth-mode-button.active {
+  background: #fff;
+  color: #103044;
+  box-shadow: 0 10px 24px rgba(16, 48, 68, 0.1);
+}
+
 .login-card h2,
 .panel h3,
 .patient-card h3 {
@@ -249,6 +277,7 @@ button {
 }
 
 .helper-copy,
+.success-banner,
 .error-banner {
   margin: 0;
   padding: 0.8rem 1rem;
@@ -259,9 +288,32 @@ button {
   background: rgba(31, 111, 235, 0.08);
 }
 
+.success-banner {
+  background: rgba(14, 159, 110, 0.12);
+  color: #0f766e;
+}
+
 .error-banner {
   background: rgba(239, 68, 68, 0.12);
   color: #9f1239;
+}
+
+.auth-secondary-actions {
+  display: grid;
+  gap: 0.55rem;
+  justify-items: start;
+}
+
+.text-button {
+  padding: 0;
+  color: #1f6feb;
+  font-weight: 600;
+}
+
+.auth-secondary-copy {
+  margin: 0;
+  color: rgba(16, 48, 68, 0.62);
+  font-size: 0.94rem;
 }
 
 .app-shell {
@@ -973,6 +1025,10 @@ button {
   .login-card {
     padding: 1.35rem;
     border-radius: 20px;
+  }
+
+  .auth-mode-switch {
+    width: 100%;
   }
 
   .metric-card strong {

@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { isFirebaseConfigured } from '../lib/firebase';
 import { useAppStore } from '../store/useAppStore';
 
+type AuthMode = 'login' | 'signup';
+
 function EyeIcon({ open }: { open: boolean }) {
   return open ? (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -25,10 +27,16 @@ export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const login = useAppStore((state) => state.login);
+  const signup = useAppStore((state) => state.signup);
+  const resetPassword = useAppStore((state) => state.resetPassword);
   const session = useAppStore((state) => state.session);
   const isAuthenticating = useAppStore((state) => state.isAuthenticating);
   const authError = useAppStore((state) => state.authError);
+  const authNotice = useAppStore((state) => state.authNotice);
   const clearAuthError = useAppStore((state) => state.clearAuthError);
+  const clearAuthNotice = useAppStore((state) => state.clearAuthNotice);
+  const [authMode, setAuthMode] = useState<AuthMode>('login');
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -42,7 +50,10 @@ export function LoginPage() {
     }
   }, [location.state, navigate, session]);
 
-  useEffect(() => clearAuthError, [clearAuthError]);
+  useEffect(() => {
+    clearAuthError();
+    clearAuthNotice();
+  }, [clearAuthError, clearAuthNotice, authMode]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -59,7 +70,34 @@ export function LoginPage() {
       return;
     }
 
+    if (authMode === 'signup') {
+      if (!name.trim()) {
+        setValidationError('Full name is required.');
+        return;
+      }
+
+      if (password.trim().length < 6) {
+        setValidationError('Password must be at least 6 characters.');
+        return;
+      }
+
+      await signup(name.trim(), email.trim(), password);
+      return;
+    }
+
     await login(email.trim(), password);
+  }
+
+  async function handleResetPassword() {
+    setValidationError('');
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      setValidationError('Enter your email address first to reset the password.');
+      return;
+    }
+
+    await resetPassword(email.trim());
   }
 
   return (
@@ -92,12 +130,31 @@ export function LoginPage() {
         <form className="login-card" onSubmit={handleSubmit}>
           <div>
             <p className="eyebrow">Secure Access</p>
-            <h2>Sign in to HealthSync Ops</h2>
+            <h2>{authMode === 'login' ? 'Sign in to HealthSync Ops' : 'Create your admin account'}</h2>
             <p className="muted-copy">
               {isFirebaseConfigured
-                ? 'Authenticate with your Firebase user credentials.'
+                ? authMode === 'login'
+                  ? 'Use your authorized care operations account to access dashboards, analytics, and patient workflows.'
+                  : 'Create a Firebase-backed account to access the care operations workspace and patient workflows.'
                 : 'Firebase configuration is required. Add your Firebase web app values to the local environment before testing login.'}
             </p>
+          </div>
+
+          <div className="auth-mode-switch" role="tablist" aria-label="Authentication mode">
+            <button
+              type="button"
+              className={authMode === 'login' ? 'auth-mode-button active' : 'auth-mode-button'}
+              onClick={() => setAuthMode('login')}
+            >
+              Sign In
+            </button>
+            <button
+              type="button"
+              className={authMode === 'signup' ? 'auth-mode-button active' : 'auth-mode-button'}
+              onClick={() => setAuthMode('signup')}
+            >
+              Sign Up
+            </button>
           </div>
 
           {!isFirebaseConfigured && (
@@ -105,6 +162,18 @@ export function LoginPage() {
               Missing Firebase setup. Populate `.env` from `.env.example` and enable
               Email/Password auth in Firebase.
             </p>
+          )}
+
+          {authMode === 'signup' && (
+            <label className="field">
+              <span>Full Name</span>
+              <input
+                type="text"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                placeholder="Care team admin"
+              />
+            </label>
           )}
 
           <label className="field">
@@ -137,6 +206,7 @@ export function LoginPage() {
             </div>
           </label>
 
+          {authNotice && <p className="success-banner">{authNotice}</p>}
           {(validationError || authError) && (
             <p className="error-banner">{validationError || authError}</p>
           )}
@@ -146,8 +216,30 @@ export function LoginPage() {
             className="primary-button"
             disabled={isAuthenticating || !isFirebaseConfigured}
           >
-            {isAuthenticating ? 'Signing in...' : 'Login'}
+            {isAuthenticating
+              ? authMode === 'login'
+                ? 'Signing in...'
+                : 'Creating account...'
+              : authMode === 'login'
+                ? 'Login'
+                : 'Create Account'}
           </button>
+
+          <div className="auth-secondary-actions">
+            <button
+              type="button"
+              className="text-button"
+              onClick={handleResetPassword}
+              disabled={isAuthenticating || !isFirebaseConfigured}
+            >
+              Forgot password?
+            </button>
+            <p className="auth-secondary-copy">
+              {authMode === 'login'
+                ? 'New admin? Use Sign Up to create access.'
+                : 'Already have an account? Switch back to Sign In.'}
+            </p>
+          </div>
         </form>
       </section>
     </div>
